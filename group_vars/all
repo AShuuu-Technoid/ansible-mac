@@ -4,23 +4,6 @@ user_name: rage_test
 # user_pas: "{{ lookup('password', 'pass length=14 chars=ascii_letters') }}"
 ssh_key:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 add_lang:
   - 'LANG=en_US.utf-8'
   - 'LC_ALL=en_US.utf-8'
