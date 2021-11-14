@@ -1,0 +1,39 @@
+---
+- name: Creating Test /data/sites
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    force: yes
+  with_items:
+    - { src: 'index.php', dest: '{{ uat_path }}', owner: '{{ user_name }}', group: 'nginx' }
+    - { src: 'test_uat.conf', dest: '/data/conf/nginx/', owner: 'root', group: 'root' }
+##    - { src: 'index.php', dest: '{{ live_path }}', owner: '{{ user_name }}', group: 'nginx' }
+##    - { src: 'test_live.conf', dest: '/data/conf/nginx/', owner: 'root', group: 'root' }
+  become: yes
+  become_user: root
+  become_method: sudo
+
+##- name: Config Nginx Live
+##  lineinfile:
+##    path: /data/conf/nginx/test_live.conf
+##    regexp: '^(.*)root /(.*)$'
+##    line: '    root {{ live_path }};'
+##    backrefs: yes
+
+- name: Config Nginx UAT
+  lineinfile:
+    path: /data/conf/nginx/test_uat.conf
+    regexp: '^(.*)root /(.*)$'
+    line: '    root {{ uat_path }};'
+    backrefs: yes
+
+- name: Restarting Services
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: restarted
+  with_items:
+    - nginx
+    - php-fpm

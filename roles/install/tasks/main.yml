@@ -1,0 +1,163 @@
+---
+- name: yum update
+  yum:
+    name: "*"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: yum | ensure packages are installed
+  raw: sudo amazon-linux-extras install redis6 epel nginx1 php7.4 -y
+
+- name: Installing Remi Repository
+  yum:
+    name: https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    state: present
+  become: yes
+
+- name: Installing php8.0
+  yum:
+    enablerepo: "remi,remi-php80" # If you intent to install a different version of PHP, you can change the repo according. Eg : "remi,remi-php74"
+    name:
+    - php80-php
+    - php80-php-common
+    - php80-php-cli
+    - php80-php-gd
+    - php80-php-curl #You can add or remove PHP extensions according to your choice
+    - php80-php-mysqlnd
+    - php80-php-fpm
+    - php80-php-mysqli
+    state: latest
+
+- name: Installing php7.4
+  yum:
+    enablerepo: "remi,remi-php74" # If you intent to install a different version of PHP, you can change the repo according. Eg : "remi,remi-php74"
+    name:
+    - php74-php
+    - php74-php-common
+    - php74-php-cli
+    - php74-php-gd
+    - php74-php-curl #You can add or remove PHP extensions according to your choice
+    - php74-php-mysqlnd
+    - php74-php-fpm
+    - php74-php-mysqli
+    state: latest
+  # notify: all service
+
+- name: php modules installing
+  yum:
+    name: [
+      'php80-php-gd',
+      'php80-php-mbstring',
+      'php80-php-pdo',
+      'php80-php-xml',
+      'php80-php-pear',
+      'php80-php-pecl-imagick',
+      'php80-php-sodium',
+      'php80-php-bcmath',
+      'php80-php-intl',
+      'python-pip',
+      'python-PyMySQL'
+    ]
+    skip_broken: yes
+    state: present
+  become: yes
+  ignore_errors: true
+
+- name: MariaDB Repo adding
+  copy:
+    src: "MariaDB.repo"
+    dest: "/etc/yum.repos.d/"
+    force: yes
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: MariaDB installing
+  yum:
+    name: [
+      '*',
+      'MariaDB-server',
+      'MariaDB-client'
+    ]
+    skip_broken: yes
+    state: present
+    update_cache: yes
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: MySQL | stoping mysql
+  service:
+   name: mariadb
+   state: stopped
+  become: yes
+
+- name: Copying MSQL Config file
+  copy:
+   src: my.cnf
+   dest: /etc/
+   owner: root
+   group: root
+  become: yes
+
+- name: Changing mysql data path
+  copy:
+   src: "/var/lib/mysql"
+   dest: "/data/db/"
+   owner: mysql
+   group: mysql
+   remote_src: yes
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: MySQL | restart mysql
+  service:
+   name: mariadb
+   state: restarted
+  become: yes
+  ignore_errors: true
+
+- name: Nginx Configuration
+  copy:
+    src: "nginx.conf"
+    dest: "/etc/nginx/"
+    force: yes
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: PHP Configuration
+  copy:
+    src: "www.conf"
+    dest: "/etc/php-fpm.d/"
+    force: yes
+  become: yes
+  become_user: root
+  become_method: sudo
+
+#   # raw: sudo yum install php-gd php-mbstring php-pdo php-xml php-pear php-pecl-imagick php-sodium php-bcmath php-intl mysql -y
+#   # handlers:
+- name: Adding LANG | LC_ALL
+  lineinfile:
+    path: /etc/environment
+    line: '{{ item }}'
+    state: present
+  with_items:
+    - 'LANG=en_US.utf-8'
+    - 'LC_ALL=en_US.utf-8'
+
+- name: Installing php-pecl-mcrypt
+  raw: sudo yum install -y --enablerepo=epel php-mcrypt --skip-broken
+
+- name: all service
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - nginx
+    - php-fpm
+    - redis
+    - mariadb

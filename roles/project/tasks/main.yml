@@ -1,0 +1,78 @@
+---
+###- name: Creating Default Folders
+###  file:
+###    path: "{{ item }}"
+###    state: directory
+###    owner: 'root'
+###    group: 'root'
+###  with_items:
+###    - "/data/backup"
+###    - "/data/conf"
+###    - "/data/db"
+###    - "/data/docker"
+###    - "/data/redis"
+###    - "/data/sites"
+###    - "/data/conf/nginx"
+###    - "/data/sites/live"
+###    - "/data/sites/uat"
+###    - "/data/sites/live/public"
+###    - "/data/sites/live/logs"
+###    - "/data/sites/uat/public"
+###    - "/data/sites/uat/logs"
+###  become: yes
+###  become_user: root
+###  become_method: sudo
+
+- name: Creating Users
+  user:
+      name: "{{ user_name }}"
+      groups:
+        - nginx
+      state: present
+      append: yes
+      shell: /bin/bash
+      createhome: yes
+
+- name: Creating Files
+  raw: mkdir /data/{conf/nginx,backup,db,docker,redis,sites/uat/{public,logs}/{{ project_name }}} -p
+
+
+- name: Changing Permission
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ user_name }}"
+    group: nginx
+  with_items:
+    - "{{ uat_path }}"
+    - "{{ uat_log }}"
+##    - "{{ live_path }}"
+##    - "{{ live_log }}"
+#
+#- name: Adding ssh-key
+#  authorized_key:
+#      user: "{{ user_name }}"
+#      state: present
+#      key: "{{ lookup('file', item) }}"
+#  with_items: "{{ ssh_key }}"
+##
+####
+# - name: Changing folder permission
+#   file:
+#       path: /data/sites
+#       owner: "ec2-user"
+#       group: nginx
+#       recurse: yes
+
+###- name: Removing files
+###  file:
+###      path: "{{ item }}"
+###      state: absent
+###  with_items:
+###    - /etc/nginx/conf.d/php-fpm.conf
+###    - /etc/nginx/default.d/php.conf
+
+# - name: Creating Default Folder
+#   raw: mkdir /data/{conf/nginx,backup,db,docker,redis,sites/uat/{public,logs}/{{ project_name }}} -p
+#   become: yes
+#   become_user: root
+#   become_method: sudo
