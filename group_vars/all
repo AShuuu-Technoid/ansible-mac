@@ -1,6 +1,6 @@
 ---
 # User Creation
-user_name: rage_test
+user_name: eun
 # user_pas: "{{ lookup('password', 'pass length=14 chars=ascii_letters') }}"
 ssh_key:
 
@@ -10,16 +10,16 @@ add_lang:
 
 hostname: "{{ [hostvars[groups['ec2_user'][0]]['ansible_ssh_host']] }}"
 
-project_name: rage-test
+project_name: run
 uat_path: "/data/sites/uat/public/{{ project_name }}"
 uat_log: "/data/sites/uat/logs/{{ project_name }}"
 live_path: "/data/sites/live/public/{{ project_name }}"
 live_log: "/data/sites/live/logs/{{ project_name }}"
 # Mysql
-mysql_live_user: ashwin_live
-mysql_live_db: ashwin_live_db
-mysql_uat_user: rage_test
-mysql_uat_db: rage_test_db
+mysql_live_user: demo
+mysql_live_db: demo
+mysql_uat_user: run
+mysql_uat_db: run
 mysql_live_pass: "{{ lookup('password', '.credentials/{{ project_name }}/mysql/{{ mysql_live_user }} length=14 chars=ascii_letters') }}"
 mysql_uat_pass: "{{ lookup('password', '.credentials/{{ project_name }}/mysql/{{ mysql_uat_user }} length=14 chars=ascii_letters') }}"
 

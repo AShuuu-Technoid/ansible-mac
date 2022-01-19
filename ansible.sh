@@ -134,6 +134,11 @@ host_nm() {
         ((i = i + 1))
     done
 }
+add_pyev() {
+    echo "
+[ec2_user:vars]
+ansible_python_interpreter=/usr/bin/python2.7" >>hosts
+}
 pj_nm() {
     sed -i -e "s/project_name:.*/project_name: $project_name/g" group_vars/all
 }
@@ -157,22 +162,23 @@ ansible_start() {
 }
 new_setup() {
     sed -i '' '2,10 s/#//g' roles/mysql/tasks/main.yml
-    sed -i '' '10,14 s/#//g' setup.yml
+    sed -i '' '11,15 s/#//g' setup.yml
+    sed -i '' '10 s/^/#/' setup.yml
     sed -i '' '66,72 s/#//g' roles/project/tasks/main.yml
     sed -i '' '2,24 s/#//g' roles/project/tasks/main.yml
 }
 ex_setup() {
     sed -i '' '2,10 s/^/#/' roles/mysql/tasks/main.yml
-    sed -i '' '10 s/^/#/' setup.yml
-    sed -i '' '11,14 s/#//g' setup.yml
+    sed -i '' '10,15 s/#//g' setup.yml
+    sed -i '' '11 s/^/#/' setup.yml
     sed -i '' '66,72 s/^/#/' roles/project/tasks/main.yml
     sed -i '' '2,24 s/^/#/' roles/project/tasks/main.yml
 }
 test_my_pg() {
-    sed -i '' '13 s/#//g' setup.yml
+    sed -i '' '14 s/#//g' setup.yml
 }
 test_my_pg_no() {
-    sed -i '' '13 s/^/#/' setup.yml
+    sed -i '' '14 s/^/#/' setup.yml
 }
 start() {
     read -p 'Enter Host IP : ' host_name
@@ -181,6 +187,7 @@ start() {
         exit
     else
         host_nm
+        add_pyev
     fi
     read -p 'Enter Project Name : ' project_name
     if [[ -z "$project_name" ]]; then
@@ -249,7 +256,7 @@ start() {
         exit
         ;;
     esac
-    ansible_start
+    # ansible_start
     rm_ssh_key
 }
 main() {

@@ -1,0 +1,27 @@
+---
+- name: yum update now
+  yum:
+    name: "*"
+    state: present
+    update_cache: yes
+  become: yes
+  # vars:
+  #   ansible_python_interpreter: /usr/bin/python2.7
+
+- name: Utility tools
+  yum:
+    name: [
+      'python-PyMySQL'
+    ]
+    skip_broken: yes
+    state: present
+  become: yes
+
+- name: Adding LANG | LC_ALL
+  lineinfile:
+    path: /etc/environment
+    line: '{{ item }}'
+    state: present
+  with_items:
+    - 'LANG=en_US.utf-8'
+    - 'LC_ALL=en_US.utf-8'

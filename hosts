@@ -1,2 +1,5 @@
 [ec2_user]
-host1 ansible_ssh_host=192.168.29.49
+host1 ansible_ssh_host=10.0.0.1
+
+[ec2_user:vars]
+ansible_python_interpreter=/usr/bin/python2.7
