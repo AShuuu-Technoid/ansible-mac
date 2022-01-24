@@ -20,7 +20,7 @@ add_ssh_key_no() {
     sed -i '' '51,56 s/^/#/' roles/project/tasks/main.yml
 }
 live_uat_crt() {
-    sed -i -e "s+raw:.*+raw: mkdir /data/{conf/nginx,backup,db,docker,redis,sites/{uat,live}/{public,logs}/{{ project_name }}} -p+g" roles/project/tasks/main.yml
+    sed -i -e "s+raw:.*+raw: mkdir /data/{conf/nginx,backup,db,docker,redis,sites/{uat,live}/{{ project_name }}/{public_html,logs}} -p+g" roles/project/tasks/main.yml
     sed -i '' '12,56 s/#//g' roles/mysql/tasks/main.yml
     sed -i '' '46,49 s/#//g' roles/project/tasks/main.yml
     sed -i '' '8,15 s/#//g' roles/finish/tasks/main.yml
@@ -30,7 +30,7 @@ live_uat_crt() {
 }
 
 live_crt() {
-    sed -i -e "s+raw:.*+raw: mkdir /data/{conf/nginx,backup,db,docker,redis,sites/live/{public,logs}/{{ project_name }}} -p+g" roles/project/tasks/main.yml
+    sed -i -e "s+raw:.*+raw: mkdir /data/{conf/nginx,backup,db,docker,redis,sites/live/{{ project_name }}/{public_html,logs}} -p+g" roles/project/tasks/main.yml
     sed -i '' '35,56 s/^/#/' roles/mysql/tasks/main.yml
     sed -i '' '12,33 s/#//g' roles/mysql/tasks/main.yml
     sed -i '' '46,47 s/^/#/' roles/project/tasks/main.yml
@@ -44,7 +44,7 @@ live_crt() {
     sed -i '' '25,30 s/^/#/' roles/test/tasks/main.yml
 }
 uat_crt() {
-    sed -i -e "s+raw:.*+raw: mkdir /data/{conf/nginx,backup,db,docker,redis,sites/uat/{public,logs}/{{ project_name }}} -p+g" roles/project/tasks/main.yml
+    sed -i -e "s+raw:.*+raw: mkdir /data/{conf/nginx,backup,db,docker,redis,sites/uat/{{ project_name }}/{public_html,logs}} -p+g" roles/project/tasks/main.yml
     sed -i '' '12,33 s/^/#/' roles/mysql/tasks/main.yml
     sed -i '' '35,56 s/#//g' roles/mysql/tasks/main.yml
     sed -i '' '48,49 s/^/#/' roles/project/tasks/main.yml
